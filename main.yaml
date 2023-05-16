@@ -1,0 +1,50 @@
+---
+- name: Install and configure Docker and dependencies
+  hosts: ec2
+  become: true
+  tasks:
+
+    - name: Install Docker and pip
+      ansible.builtin.package: 
+        name: 
+          - docker
+          - python3-pip
+        update_cache: true
+
+    - name: Ensure Docker daemon is running
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+
+    - name: Add ec2-user to docker group
+      ansible.builtin.user:
+        name: ec2-user
+        groups: docker
+        append: true
+
+    - name: Reconnect to server after usermod
+      ansible.builtin.meta: reset_connection
+
+- name: Create and configure MySQL in Docker
+  hosts: ec2
+  vars_files: vars.yaml
+  tasks:
+
+    - name: Deploy MySQL docker container
+      import_tasks:
+        file: mysql_docker.yaml
+
+    - name: Sleep for 30 seconds and continue with play
+      ansible.builtin.wait_for:
+        timeout: 30
+      delegate_to: localhost 
+        
+    - name: Create database and user
+      import_tasks:
+        file: mysql_db_user.yaml
+    
+
+
+
+
+        

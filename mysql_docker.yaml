@@ -1,0 +1,29 @@
+---
+- name: Install docker python module
+  ansible.builtin.pip:
+    name: docker
+
+- name: Downgrading requests version to avoid pull error
+  ansible.builtin.pip:
+    name: requests
+    version: 2.28.1
+
+- name: Installing MySQL connector
+  ansible.builtin.pip:
+    name: PyMySQL
+
+- name: Pulling MySQL Docker image
+  community.docker.docker_image:
+    name: mysql
+    source: pull
+    
+- name: Starting MySQL docker container
+  community.docker.docker_container:
+    name: mysql-0
+    image: mysql
+    state: started
+    restart_policy: always
+    ports: 
+      - 3306:3306
+    env:
+        MYSQL_ROOT_PASSWORD=mysql_pass
