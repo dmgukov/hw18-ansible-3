@@ -1,0 +1,18 @@
+---
+- name: Creating database
+  community.mysql.mysql_db:
+    login_host: localhost
+    login_user: root
+    login_password: mysql_pass
+    name: hillel_hw
+    state: present
+
+- name: Creating MySQL user
+  community.mysql.mysql_user:
+    login_host: localhost
+    login_user: root
+    login_password: mysql_pass
+    name: mysql_user
+    password: mysql_user_pass
+    priv: "hillel_hw.*:ALL"
+    state: present
